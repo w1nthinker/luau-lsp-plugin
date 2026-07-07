@@ -29,11 +29,12 @@ if is_roblox_project; then
   curl -fsSL --max-time 30 -z "$DOCS" -o "$DOCS" \
     "https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/roblox/api-docs/en-us.json" || true
 
-  set --
-  [ -s "$TYPES" ] && set -- "$@" "--definitions=$TYPES"
-  [ -s "$DOCS" ] && set -- "$@" "--docs=$DOCS"
-  exec luau-lsp lsp "$@"
+  DEFARG=""
+  DOCARG=""
+  [ -s "$TYPES" ] && DEFARG="--definitions=$TYPES"
+  [ -s "$DOCS" ] && DOCARG="--docs=$DOCS"
+  exec luau-lsp lsp ${DEFARG:+"$DEFARG"} ${DOCARG:+"$DOCARG"} "$@"
 fi
 
-# ponytail: plain Luau mode — no defs needed; luau-lsp ships builtin Luau globals
-exec luau-lsp lsp
+# plain Luau mode — no Roblox defs; luau-lsp ships builtin Luau globals
+exec luau-lsp lsp "$@"

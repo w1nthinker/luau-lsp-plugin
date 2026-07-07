@@ -1,0 +1,31 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "luau-lsp-marketplace",
+  "description": "Luau language server plugin for Claude Code",
+  "owner": {
+    "name": "w1nthinker"
+  },
+  "plugins": [
+    {
+      "name": "luau-lsp",
+      "description": "Luau language server for code intelligence, with automatic Roblox type support",
+      "version": "1.0.0",
+      "author": {
+        "name": "w1nthinker"
+      },
+      "homepage": "https://github.com/JohnnyMorganz/luau-lsp",
+      "source": "./plugins/luau-lsp",
+      "category": "development",
+      "strict": false,
+      "lspServers": {
+        "luau": {
+          "command": "${CLAUDE_PLUGIN_ROOT}/bin/luau-lsp-wrapper.sh",
+          "extensionToLanguage": {
+            ".luau": "luau",
+            ".lua": "luau"
+          }
+        }
+      }
+    }
+  ]
+}

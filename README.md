@@ -7,11 +7,11 @@ Gives Claude Code code intelligence, type checking, and diagnostics for `.luau` 
 ## Install
 
 1. Install the `luau-lsp` binary (`brew install luau-lsp`, `rokit add JohnnyMorganz/luau-lsp`, or grab a [release](https://github.com/JohnnyMorganz/luau-lsp/releases)).
-2. In Claude Code:
+2. Add the marketplace and install the plugin:
 
-```
-/plugin marketplace add w1nthinker/luau-lsp-plugin
-/plugin install luau-lsp@luau-lsp-marketplace
+```bash
+claude plugin marketplace add w1nthinker/luau-lsp-plugin
+claude plugin install luau-lsp@luau-lsp-marketplace
 ```
 
 See [plugins/luau-lsp/README.md](plugins/luau-lsp/README.md) for details.

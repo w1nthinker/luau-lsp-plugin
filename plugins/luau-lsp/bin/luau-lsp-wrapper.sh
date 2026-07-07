@@ -22,17 +22,12 @@ if is_roblox_project; then
   DOCS="$CACHE/api-docs.json"
   mkdir -p "$CACHE"
 
-  # Download once, then cache. On failure fall back gracefully (plain Luau mode).
-  if [ ! -s "$TYPES" ]; then
-    curl -fsSL --max-time 30 -o "$TYPES" \
-      "https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.d.luau" \
-      || rm -f "$TYPES"
-  fi
-  if [ ! -s "$DOCS" ]; then
-    curl -fsSL --max-time 30 -o "$DOCS" \
-      "https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/roblox/api-docs/en-us.json" \
-      || rm -f "$DOCS"
-  fi
+  # Refresh check on every server start: -z only re-downloads when the remote
+  # copy is newer than the cache. Offline or failed requests keep the cache.
+  curl -fsSL --max-time 30 -z "$TYPES" -o "$TYPES" \
+    "https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.d.luau" || true
+  curl -fsSL --max-time 30 -z "$DOCS" -o "$DOCS" \
+    "https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/roblox/api-docs/en-us.json" || true
 
   set --
   [ -s "$TYPES" ] && set -- "$@" "--definitions=$TYPES"

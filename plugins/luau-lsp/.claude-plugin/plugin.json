@@ -1,7 +1,7 @@
 {
   "name": "luau-lsp",
   "description": "Luau language server (luau-lsp) for code intelligence — supports both Roblox and plain Luau projects",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "w1nthinker"
   },

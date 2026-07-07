@@ -7,7 +7,7 @@ Works for **both Roblox and non-Roblox Luau**:
 - If the workspace contains a Rojo project (`*.project.json`), `sourcemap.json`, or `wally.toml`, the plugin automatically downloads and caches the Roblox API type definitions (`globalTypes.d.luau`) and API docs, giving full Roblox type awareness (Instances, services, DataTypes, enums).
 - Otherwise it runs in plain Luau mode with the builtin Luau globals only.
 
-Cached Roblox definitions live in `~/.cache/claude-luau-lsp/`. Delete that directory to force a refresh after a Roblox API update.
+Roblox definitions are cached in `~/.cache/claude-luau-lsp/` and refreshed automatically on each language-server start (a cheap conditional request that only re-downloads when Roblox ships new API definitions; offline starts use the cache).
 
 ## Supported Extensions
 `.luau`, `.lua`

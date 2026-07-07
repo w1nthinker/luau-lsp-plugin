@@ -9,7 +9,7 @@
     {
       "name": "luau-lsp",
       "description": "Luau language server for code intelligence, with automatic Roblox type support",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "w1nthinker"
       },

@@ -70,7 +70,26 @@ export ARGS_OUT="$TMP/args-local"
 (cd "$TMP/plain" && PATH="$BASE_PATH" "$WRAPPER")
 [ "$(cat "$ARGS_OUT")" = "lsp" ] || fail "project-local args: $(cat "$ARGS_OUT")"
 
-# 6. Windows-style toolchain install: only luau-lsp.exe exists (rokit dir)
+# 6. Broken shim on PATH is skipped in favor of a working toolchain install
+BROKEN_DIR="$TMP/broken-bin"
+mkdir -p "$BROKEN_DIR" "$HOME/.rokit/bin"
+printf '#!/bin/sh\nexit 1\n' > "$BROKEN_DIR/luau-lsp"
+chmod +x "$BROKEN_DIR/luau-lsp"
+cp "$STUB_DIR/luau-lsp" "$HOME/.rokit/bin/luau-lsp"
+export ARGS_OUT="$TMP/args-broken-shim"
+mkdir -p "$TMP/noproj"
+(cd "$TMP/noproj" && PATH="$BROKEN_DIR:$BASE_PATH" "$WRAPPER" 2>/dev/null)
+[ "$(cat "$ARGS_OUT")" = "lsp" ] || fail "broken-shim args: $(cat "$ARGS_OUT")"
+rm -rf "$HOME/.rokit"
+
+# 7. Only a broken binary anywhere -> still used, with a warning
+export ARGS_OUT="$TMP/args-fallback"
+: > "$ARGS_OUT"
+(cd "$TMP/noproj" && PATH="$BROKEN_DIR:$BASE_PATH" "$WRAPPER" 2>"$TMP/fallback-err") || true
+grep -q "failed a '--version' probe" "$TMP/fallback-err" \
+  || fail "missing fallback warning: $(cat "$TMP/fallback-err")"
+
+# 8. Windows-style toolchain install: only luau-lsp.exe exists (rokit dir)
 mkdir -p "$TMP/exe" "$HOME/.rokit/bin"
 cp "$STUB_DIR/luau-lsp" "$HOME/.rokit/bin/luau-lsp.exe"
 export ARGS_OUT="$TMP/args-exe"

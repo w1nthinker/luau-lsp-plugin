@@ -46,10 +46,24 @@ find_roblox_root() {
   done
 }
 
+# Accept $1 only if it actually runs; a broken toolchain shim (e.g. a mise
+# shim with no version pinned) is executable yet fails instantly, and picking
+# it would crash-loop the server while shadowing a working install. The first
+# reject is kept as a fallback in case an unusual binary fails the probe.
+try_luau_lsp() {
+  if "$1" --version >/dev/null 2>&1; then
+    printf '%s\n' "$1"
+    return 0
+  fi
+  [ -n "$FALLBACK_BIN" ] || FALLBACK_BIN=$1
+  return 1
+}
+
 # Locate the luau-lsp binary. Claude Code may be launched without a login
 # shell's PATH (e.g. from the desktop app), so a plain PATH lookup is not
 # enough: also probe the project and common toolchain shim directories.
 find_luau_lsp() {
+  FALLBACK_BIN=""
   if [ -n "${LUAU_LSP_BIN:-}" ]; then
     if [ -x "$LUAU_LSP_BIN" ]; then
       printf '%s\n' "$LUAU_LSP_BIN"
@@ -59,8 +73,7 @@ find_luau_lsp() {
     return 1
   fi
   if command -v luau-lsp >/dev/null 2>&1; then
-    command -v luau-lsp
-    return 0
+    try_luau_lsp "$(command -v luau-lsp)" && return 0
   fi
   for candidate in \
     "$1/luau-lsp" \
@@ -72,11 +85,15 @@ find_luau_lsp() {
     ${LOCALAPPDATA:+"$LOCALAPPDATA/mise/shims/luau-lsp"}; do
     for probe in "$candidate" "$candidate.exe"; do
       if [ -x "$probe" ]; then
-        printf '%s\n' "$probe"
-        return 0
+        try_luau_lsp "$probe" && return 0
       fi
     done
   done
+  if [ -n "$FALLBACK_BIN" ]; then
+    warn "$FALLBACK_BIN failed a '--version' probe (broken toolchain shim?); trying it anyway"
+    printf '%s\n' "$FALLBACK_BIN"
+    return 0
+  fi
   return 1
 }
 

@@ -4,7 +4,7 @@
 
 Gives Claude Code code intelligence, type checking, and diagnostics for `.luau` and `.lua` files — in **both Roblox and plain Luau projects**. Roblox projects (detected via `*.project.json`, `sourcemap.json`, or `wally.toml`, searched upward from the workspace directory) automatically get the full Roblox API type definitions and docs.
 
-Requires macOS or Linux (the server is launched through a POSIX shell wrapper; on Windows, use WSL).
+Works on macOS, Linux, and Windows. On Windows a POSIX `sh` must be on `PATH` — [Git for Windows](https://git-scm.com/downloads/win) provides one (see the [Windows notes](plugins/luau-lsp/README.md#windows)); WSL also works.
 
 ## Install
 

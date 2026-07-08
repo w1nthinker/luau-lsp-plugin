@@ -70,4 +70,12 @@ export ARGS_OUT="$TMP/args-local"
 (cd "$TMP/plain" && PATH="$BASE_PATH" "$WRAPPER")
 [ "$(cat "$ARGS_OUT")" = "lsp" ] || fail "project-local args: $(cat "$ARGS_OUT")"
 
+# 6. Windows-style toolchain install: only luau-lsp.exe exists (rokit dir)
+mkdir -p "$TMP/exe" "$HOME/.rokit/bin"
+cp "$STUB_DIR/luau-lsp" "$HOME/.rokit/bin/luau-lsp.exe"
+export ARGS_OUT="$TMP/args-exe"
+(cd "$TMP/exe" && PATH="$BASE_PATH" "$WRAPPER")
+[ "$(cat "$ARGS_OUT")" = "lsp" ] || fail ".exe probe args: $(cat "$ARGS_OUT")"
+rm -rf "$HOME/.rokit"
+
 echo "all smoke tests passed"

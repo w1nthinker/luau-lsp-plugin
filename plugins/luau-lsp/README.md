@@ -7,7 +7,7 @@ Works for **both Roblox and non-Roblox Luau**:
 - If the workspace is part of a Rojo project (`*.project.json`), or contains a `sourcemap.json` or `wally.toml` — searched upward from the working directory, so subdirectories of a project are detected too — the plugin automatically downloads and caches the Roblox API type definitions (`globalTypes.d.luau`) and API docs, giving full Roblox type awareness (Instances, services, DataTypes, enums).
 - Otherwise it runs in plain Luau mode with the builtin Luau globals only.
 
-Requires macOS or Linux (the server is launched through a POSIX shell wrapper; on Windows, use WSL).
+Works on macOS, Linux, and Windows (see [Windows](#windows) for the one requirement).
 
 ## Supported Extensions
 `.luau`, `.lua`
@@ -40,7 +40,19 @@ Claude Code doesn't always inherit your shell's `PATH` (e.g. when launched from 
 1. `LUAU_LSP_BIN` environment variable, if set (must point at an executable)
 2. `PATH`
 3. Project-local copies: `<project>/luau-lsp`, `<project>/bin/luau-lsp`
-4. Toolchain install dirs: `~/.rokit/bin`, `~/.aftman/bin`, `~/.foreman/bin`, `~/.local/share/mise/shims`
+4. Toolchain install dirs: `~/.rokit/bin`, `~/.aftman/bin`, `~/.foreman/bin`, `~/.local/share/mise/shims` (plus `%LOCALAPPDATA%\mise\shims` on Windows)
+
+On Windows every location is also probed with an `.exe` suffix.
+
+## Windows
+
+Claude Code launches plugin LSP servers by spawning the configured command directly — it can't run PowerShell or batch entry points — so the wrapper runs under a POSIX `sh`, which must be on `PATH`:
+
+- **Git for Windows** (recommended): install from [git-scm.com](https://git-scm.com/downloads/win) and make sure `sh` is reachable from `PATH`. The installer option *"Use Git and optional Unix tools from the Command Prompt"* does this, or add `C:\Program Files\Git\bin` to `PATH` yourself. Claude Code already recommends Git for Windows for its Bash tool, so most setups have it.
+- **MSYS2 / Cygwin** `sh` on `PATH` works too.
+- **WSL**: run Claude Code inside WSL and everything behaves as on Linux.
+
+If the server fails to start with an error like `'sh' is not recognized`, `sh` is missing from `PATH`.
 
 ## Caching & refresh
 

@@ -28,5 +28,28 @@ jobs:
       - name: ShellCheck
         run: shellcheck plugins/luau-lsp/bin/luau-lsp-wrapper.sh tests/smoke.sh
 
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
       - name: Smoke tests
         run: tests/smoke.sh
+
+  smoke-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Smoke tests (Git Bash)
+        shell: bash
+        run: tests/smoke.sh
+
+      # Claude Code launches the wrapper on Windows as `sh <script>` through
+      # cmd.exe (cross-spawn shebang handling), so exercise that exact shape.
+      - name: Smoke tests launched like Claude Code (cmd -> sh)
+        shell: cmd
+        run: sh tests/smoke.sh

@@ -1,8 +1,12 @@
 #!/bin/sh
 # Wrapper for luau-lsp used by the Claude Code plugin.
 #
+# - Runs on macOS, Linux, and Windows. Claude Code spawns this script through
+#   its shebang on POSIX; on Windows it runs it as `sh <script>` via cmd.exe,
+#   so any POSIX sh on PATH (Git for Windows, MSYS2, Cygwin) works.
 # - Locates the luau-lsp binary: LUAU_LSP_BIN override, PATH, project-local
-#   copies, then well-known toolchain shim directories (rokit/aftman/...).
+#   copies, then well-known toolchain shim directories (rokit/aftman/...);
+#   on Windows each location is also probed with an .exe suffix.
 # - Detects Roblox projects by walking up from the working directory looking
 #   for a Rojo project file, sourcemap.json, or wally.toml.
 # - In Roblox mode, supplies cached Roblox API type definitions + docs. Type
@@ -12,6 +16,13 @@
 #   are atomic, so an interrupted transfer never corrupts the cache, and
 #   offline starts fall back to the cached copies.
 set -u
+
+# Under Git Bash/MSYS launched from cmd.exe no profile runs, so /usr/bin may
+# be missing from PATH and same-named Windows tools (find.exe) would win.
+case ":$PATH:" in
+  *:/usr/bin:*) ;;
+  *) [ -d /usr/bin ] && PATH="/usr/bin:$PATH" ;;
+esac
 
 warn() { echo "luau-lsp plugin: $*" >&2; }
 
@@ -29,8 +40,9 @@ find_roblox_root() {
       printf '%s\n' "$dir"
       return 0
     fi
-    [ "$dir" = / ] && return 1
-    dir=$(dirname "$dir")
+    parent=$(dirname "$dir")
+    [ "$parent" = "$dir" ] && return 1
+    dir=$parent
   done
 }
 
@@ -56,11 +68,14 @@ find_luau_lsp() {
     "$HOME/.rokit/bin/luau-lsp" \
     "$HOME/.aftman/bin/luau-lsp" \
     "$HOME/.foreman/bin/luau-lsp" \
-    "$HOME/.local/share/mise/shims/luau-lsp"; do
-    if [ -x "$candidate" ]; then
-      printf '%s\n' "$candidate"
-      return 0
-    fi
+    "$HOME/.local/share/mise/shims/luau-lsp" \
+    ${LOCALAPPDATA:+"$LOCALAPPDATA/mise/shims/luau-lsp"}; do
+    for probe in "$candidate" "$candidate.exe"; do
+      if [ -x "$probe" ]; then
+        printf '%s\n' "$probe"
+        return 0
+      fi
+    done
   done
   return 1
 }

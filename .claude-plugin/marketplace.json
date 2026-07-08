@@ -9,23 +9,16 @@
     {
       "name": "luau-lsp",
       "description": "Luau language server for code intelligence, with automatic Roblox type support",
-      "version": "1.0.2",
+      "version": "1.2.0",
       "author": {
         "name": "w1nthinker"
       },
+      "license": "MIT",
       "homepage": "https://github.com/JohnnyMorganz/luau-lsp",
       "source": "./plugins/luau-lsp",
       "category": "development",
-      "strict": false,
-      "lspServers": {
-        "luau": {
-          "command": "${CLAUDE_PLUGIN_ROOT}/bin/luau-lsp-wrapper.sh",
-          "extensionToLanguage": {
-            ".luau": "luau",
-            ".lua": "luau"
-          }
-        }
-      }
+      "keywords": ["luau", "lua", "roblox", "rojo", "lsp", "language-server"],
+      "strict": false
     }
   ]
 }

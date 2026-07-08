@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON manifests
+        run: |
+          jq empty .claude-plugin/marketplace.json
+          jq empty plugins/luau-lsp/.claude-plugin/plugin.json
+
+      - name: Manifest versions match
+        run: |
+          m=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
+          p=$(jq -r '.version' plugins/luau-lsp/.claude-plugin/plugin.json)
+          if [ "$m" != "$p" ]; then
+            echo "version mismatch: marketplace=$m plugin=$p" >&2
+            exit 1
+          fi
+
+      - name: ShellCheck
+        run: shellcheck plugins/luau-lsp/bin/luau-lsp-wrapper.sh tests/smoke.sh
+
+      - name: Smoke tests
+        run: tests/smoke.sh
